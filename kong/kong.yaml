@@ -1,0 +1,41 @@
+_format_version: "3.0"
+_transform: true
+
+services:
+  - name: user-service
+    url: http://user-service.api-platform.svc.cluster.local
+
+    routes:
+      - name: login-route
+        paths:
+          - /login
+        strip_path: false
+
+      - name: health-route
+        paths:
+          - /health
+        strip_path: false
+
+      - name: verify-route
+        paths:
+          - /verify
+        strip_path: false
+
+      - name: users-route
+        paths:
+          - /users
+        strip_path: false
+
+        plugins:
+          - name: jwt
+
+          - name: rate-limiting
+            config:
+              minute: 10
+              policy: local
+
+          - name: ip-restriction
+            config:
+              allow:
+                - 127.0.0.1/32
+                - 10.0.0.0/8

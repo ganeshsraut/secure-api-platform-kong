@@ -1,0 +1,53 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongIngress
+metadata:
+  name: api-secure
+  namespace: default
+spec:
+  route:
+    protocols:
+      - https
+    https_redirect_status_code: 301
+  upstream:
+    algorithm: round_robin
+  proxy:
+    connect_timeout: 60000
+    send_timeout: 60000
+    read_timeout: 60000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: default
+  annotations:
+    konghq.com/ingress.class: kong
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: kong
+  tls:
+    - hosts:
+        - api.example.com
+      secretName: api-tls-cert
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-service
+                port:
+                  number: 8080
+---
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: api-auth
+  namespace: default
+plugin: key-auth
+config:
+  key_names:
+    - apikey
+  hide_credentials: true

@@ -1,0 +1,6 @@
+env:
+  database: "off"
+  plugins: bundled,custom-plugin
+
+dblessConfig:
+  configMap: kong-config

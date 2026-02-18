@@ -1,0 +1,5 @@
+image:
+  repository: user-service
+  tag: latest
+
+jwtSecret: "supersecret"
